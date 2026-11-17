@@ -1,0 +1,44 @@
+# ---------------------------------------------------------------------------
+# Preenchido pela esteira (--set). Não coloque nos values do serviço:
+# a esteira sobrescreve com o nome do repositório, as custom properties e a imagem
+# que ela acabou de publicar.
+# ---------------------------------------------------------------------------
+platform:
+  name: ""         # nome do repositório: <sigla>-<produto>-<aplicação>
+  sigla: ""
+  product: ""      # <sigla>-<produto>
+  environment: ""  # dev | hml | prd
+image:
+  repository: ""
+  tag: ""
+
+# ---------------------------------------------------------------------------
+# O que o time ajusta em deploy/values.yaml e deploy/values-<ambiente>.yaml
+# ---------------------------------------------------------------------------
+replicas: 1
+
+# porta HTTP do container
+port: 8080
+
+# teto por container: 2 CPU / 4Gi (política da plataforma)
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# variáveis de ambiente; os valores aceitam template ({{ .Values.platform.name }})
+env: {}
+
+probes:
+  liveness: /health/liveness
+  readiness: /health/readiness
+  # tempo máximo para subir (startupProbe), em segundos
+  startupSeconds: 180
+
+# exposição fora do cluster (OpenShift Route, TLS na borda do router)
+route:
+  enabled: false
+  host: ""

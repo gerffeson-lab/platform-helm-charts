@@ -1,0 +1,5 @@
+apiVersion: v2
+name: app
+description: Chart de aplicação da plataforma. O serviço só traz os values; nome, imagem e ambiente vêm da esteira.
+type: application
+version: 1.0.0

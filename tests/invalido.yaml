@@ -1,0 +1,4 @@
+# Erros que o schema precisa barrar: campo fora do contrato e tag latest.
+platform: {name: crt-credito-autorizador, sigla: crt, product: crt-credito, environment: dev}
+image: {repository: ghcr.io/gerffeson-lab/crt-credito-autorizador, tag: latest}
+namespace: outro-produto

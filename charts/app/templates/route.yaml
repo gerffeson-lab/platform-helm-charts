@@ -1,0 +1,22 @@
+{{- if .Values.route.enabled }}
+# OpenShift: o router (HAProxy) recebe o tráfego de fora e termina o TLS (edge).
+# Sem host, o OpenShift gera <nome>-<namespace>.apps.<domínio do cluster>.
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "app.name" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  {{- with .Values.route.host }}
+  host: {{ . }}
+  {{- end }}
+  to:
+    kind: Service
+    name: {{ include "app.name" . }}
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+{{- end }}

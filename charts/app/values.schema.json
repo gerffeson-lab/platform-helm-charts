@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["platform", "image", "replicas", "port", "resources", "probes"],
+  "properties": {
+    "platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "sigla", "product", "environment"],
+      "properties": {
+        "name": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,59}$"},
+        "sigla": {"type": "string", "pattern": "^[a-z][a-z0-9]{1,4}$"},
+        "product": {"type": "string", "pattern": "^[a-z][a-z0-9-]+$"},
+        "environment": {"enum": ["dev", "hml", "prd"]}
+      }
+    },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "tag"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "tag": {"type": "string", "minLength": 1, "not": {"const": "latest"}}
+      }
+    },
+    "replicas": {"type": "integer", "minimum": 1, "maximum": 10},
+    "port": {"type": "integer", "minimum": 1024, "maximum": 65535},
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requests", "limits"],
+      "properties": {
+        "requests": {"$ref": "#/definitions/recursos"},
+        "limits": {"$ref": "#/definitions/recursos"}
+      }
+    },
+    "env": {
+      "type": "object",
+      "propertyNames": {"pattern": "^[A-Z_][A-Z0-9_]*$"},
+      "additionalProperties": {"type": "string"}
+    },
+    "probes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["liveness", "readiness", "startupSeconds"],
+      "properties": {
+        "liveness": {"type": "string", "pattern": "^/"},
+        "readiness": {"type": "string", "pattern": "^/"},
+        "startupSeconds": {"type": "integer", "minimum": 10, "maximum": 600}
+      }
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "host": {"type": "string"}
+      }
+    }
+  },
+  "definitions": {
+    "recursos": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cpu", "memory"],
+      "properties": {
+        "cpu": {"type": ["string", "number"]},
+        "memory": {"type": "string"}
+      }
+    }
+  }
+}

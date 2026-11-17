@@ -1,0 +1,22 @@
+# Values de um serviço do golden path Java (como em deploy/values.yaml do boilerplate),
+# mais o que a esteira injeta. Usado na CI deste repo.
+platform:
+  name: crt-credito-autorizador
+  sigla: crt
+  product: crt-credito
+  environment: dev
+image:
+  repository: ghcr.io/gerffeson-lab/crt-credito-autorizador
+  tag: sha-abc1234
+replicas: 2
+resources:
+  requests: {cpu: 100m, memory: 384Mi}
+  limits: {cpu: "1", memory: 768Mi}
+env:
+  SPRING_APPLICATION_NAME: "{{ .Values.platform.name }}"
+probes:
+  liveness: /actuator/health/liveness
+  readiness: /actuator/health/readiness
+  startupSeconds: 180
+route:
+  enabled: true

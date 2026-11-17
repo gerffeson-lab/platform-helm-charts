@@ -1,0 +1,35 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  chart:
+    name: lint e render
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.19.0
+      - name: Lint
+        run: helm lint charts/app -f tests/servico.yaml --strict
+      - name: Render com os values de um serviço
+        run: |
+          helm template crt-credito-autorizador charts/app -f tests/servico.yaml > render.yaml
+          for kind in ServiceAccount Deployment Service PodDisruptionBudget Route; do
+            grep -q "^kind: $kind$" render.yaml || { echo "::error::faltou $kind no render"; exit 1; }
+          done
+          grep -q 'value: "crt-credito-autorizador"' render.yaml || { echo "::error::env com template não foi resolvida"; exit 1; }
+      - name: Schema barra values fora do contrato
+        run: |
+          if helm template x charts/app -f tests/invalido.yaml > /dev/null 2> erro.txt; then
+            echo "::error::o schema deveria recusar tests/invalido.yaml"; exit 1
+          fi
+          cat erro.txt
+          grep -q "namespace" erro.txt && grep -q "latest\|/image/tag" erro.txt
